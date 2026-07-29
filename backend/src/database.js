@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
 });
 
 function prepare(sql) {
@@ -38,8 +38,8 @@ function prepare(sql) {
 
 async function initDatabase() {
   // If no DB URL is provided, we can't initialize
-  if (!process.env.DATABASE_URL) {
-    console.warn("DATABASE_URL is not set. Skipped DB initialization.");
+  if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
+    console.warn("POSTGRES_URL/DATABASE_URL is not set. Skipped DB initialization.");
     return;
   }
 
