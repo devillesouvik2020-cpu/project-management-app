@@ -1,8 +1,13 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+let connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL
+  connectionString,
+  ssl: { rejectUnauthorized: false }
 });
 
 function prepare(sql) {
