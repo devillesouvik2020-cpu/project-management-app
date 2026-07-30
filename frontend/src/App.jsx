@@ -22,7 +22,7 @@ function ProtectedRoute({ children }) {
 
 function AppRoutes() {
   return (
-    <BrowserRouter>
+    <Layout>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/clients" element={<ModulePage config={moduleConfigs.clients} />} />
@@ -35,7 +35,7 @@ function AppRoutes() {
         <Route path="/attendance" element={<ModulePage config={moduleConfigs.attendance} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </Layout>
   );
 }
 
