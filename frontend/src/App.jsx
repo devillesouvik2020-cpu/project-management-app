@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
@@ -22,7 +22,7 @@ function ProtectedRoute({ children }) {
 
 function AppRoutes() {
   return (
-    <Layout>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/clients" element={<ModulePage config={moduleConfigs.clients} />} />
@@ -35,7 +35,7 @@ function AppRoutes() {
         <Route path="/attendance" element={<ModulePage config={moduleConfigs.attendance} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Layout>
+    </BrowserRouter>
   );
 }
 
