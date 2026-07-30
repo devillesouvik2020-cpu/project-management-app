@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist',
+    outDir: '../frontend/dist', // ensure this matches your vercel root
     emptyOutDir: true,
   },
 });
