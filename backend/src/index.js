@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const { initDatabase } = require('./database');
 
 const authRoutes = require('./routes/auth');
@@ -15,7 +16,24 @@ const attendanceRoutes = require('./routes/attendance');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// Allow the frontend origin — set CORS_ORIGIN in env for production
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (curl, Render health checks, etc.)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS blocked: ${origin}`));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
@@ -38,15 +56,16 @@ app.use((err, _req, res, _next) => {
 });
 
 if (require.main === module) {
-  // Try to initialize DB if running locally, then start server
-  initDatabase().then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+  initDatabase()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('Failed to init DB:', err);
+      process.exit(1);
     });
-  }).catch((err) => {
-    console.error('Failed to init DB:', err);
-    process.exit(1);
-  });
 }
 
 module.exports = app;
