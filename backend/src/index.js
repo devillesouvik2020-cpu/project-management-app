@@ -16,16 +16,28 @@ const attendanceRoutes = require('./routes/attendance');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Allow the frontend origin — set CORS_ORIGIN in env for production
+// Explicit origins from env (comma-separated), e.g. your DuckDNS domain(s)
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
-  : ['http://localhost:5173', 'http://localhost:3000'];
+  : [];
+
+// Pattern-based: always allow any *.vercel.app preview URL and localhost
+const allowedPatterns = [
+  /^https:\/\/[\w-]+\.vercel\.app$/,   // any Vercel preview/production URL
+  /^https?:\/\/localhost(:\d+)?$/,     // local dev
+];
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true; // no-origin requests (curl, health checks)
+  if (allowedOrigins.includes(origin)) return true;
+  if (allowedPatterns.some((pattern) => pattern.test(origin))) return true;
+  return false;
+}
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (curl, Render health checks, etc.)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
         callback(new Error(`CORS blocked: ${origin}`));
@@ -34,6 +46,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
